@@ -1,9 +1,13 @@
 import { StatusBar } from "expo-status-bar";
-import { useState } from "react";
+import { useState , useEffect } from "react";
 import { StyleSheet,  View, FlatList , Alert , TouchableWithoutFeedback , Keyboard } from "react-native";
 import Form from "./components/Form";
 import Header from "./components/Header";
 import ListItem from "./components/List"; 
+
+// storge data 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 export default function App() {
 
@@ -14,6 +18,9 @@ export default function App() {
     { misson: " play on the switchs", key: "3" }, 
   ]); 
  
+
+ 
+  
   
   // /   Delete from initial arr 
   const deleteHandler = (key) => {
@@ -23,10 +30,9 @@ export default function App() {
     ))
   }
 
-  // Add to do 
+  // Add tasks
 
-  
-  const addHandler = (text) => { 
+  const addHandler =  async (text) => { 
 
     if (text.length > 3 ) {
       
@@ -36,14 +42,25 @@ export default function App() {
           ...prevMission
         ]
       )) 
+      try {
+        
+        const data =  await AsyncStorage.setItem('tasks', text)
+        console.log(data) 
+      } 
+      catch (e) {
+        console.log(e)      
+      }   
     } 
     else {
-        Alert.alert( 'opps!!' , 'todos must be over three charcter',  [
-            { text : 'underStood' }
-        ]);
+      Alert.alert( 'opps!!' , 'todos must be over three charcter',  [
+        { text : 'underStood' }
+      ]);
+      
     } 
-     
-  }
+
+  } 
+
+
 
   
 
@@ -61,7 +78,7 @@ export default function App() {
         <FlatList
       // keyExtractor={ (item) => item.key } 
         data={todos}
-        renderItem={({ item }) => (
+        renderItem={({ item }) => ( 
            
           <ListItem item={item}  deleteHandler={deleteHandler} />   
         )}
@@ -76,8 +93,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff", 
-    // alignItems: 'stretch',
-    // justifyContent: 'center',
   },
 
   contenet: {
@@ -88,6 +103,7 @@ const styles = StyleSheet.create({
   list: {
     paddingTop: 20,
     flex:1,
+    padding:0
     
   },
 
